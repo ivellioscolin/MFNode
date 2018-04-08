@@ -1,0 +1,191 @@
+MFNode Project
+
+The aim of this project is to explore MediaFoundation API. It provides some ways on how to use it.
+This project is just experimental, and you can see it as an extension to the MediaFoundation samples.
+
+You will find :
+
+- audio/video player (win32)
+- custom media session
+- sequencer source
+- audio/video capture
+- screen capture
+- kinect V1 capture
+- wave audio mixer
+- http streaming (winsock)
+- jpeg encoding (Gdiplus)
+- dxva2 technologie
+- cuda video decoding
+- directX9 renderer and shader
+- COM technologie
+- different kind of mediafoundation Source, Sink and Transform (mpeg2, flv, a52, vp6...)
+- mp3 to wave transcoder
+
+
+--------------------------------------------------
+
+* Project tree
+
+- Common
+- Docs
+- LibA52Audio (external project)
+- LibMpeg2 (external project)
+- LibMpegAudio (external project)
+- MFNodePlayer
+- MFSkDxva2Renderer
+- MFSkImageWriter
+- MFSkJpegHttpStreamer
+- MFSkVideoRenderer
+- MFSrA52Decoder
+- MFSrFlvSplitter
+- MFSrKinectCapture
+- MFSrMpeg12Decoder
+- MFSrMpeg2Splitter
+- MFSrScreenCapture
+- MFTA52Decoder
+- MFTCudaDecoder
+- MFTDxva2Decoder
+- MFTJpegEncoder
+- MFTMpeg12Decoder
+- MFTMpeg2Decoder
+- MFTVp6Decoder
+- MFTWaveMixer
+- Mp3Decoding
+
+
+--------------------------------------------------
+
+* Compilation
+
+- This project is for Windows only, because of MediaFoundation and COM (Vista and later)
+- Visual studio 2013 community (you can use an another version, not tested)
+- Windows SDK v120 (you can use an another version, not tested : you will have to change project settings according to your SDK)
+
+* optional
+
+- NVidia GPU and Cuda SDK v6.0 (you can use an another version : you will have to change project settings according to your SDK)
+- Kinect V1 SDK v1.7 (you can use an another version : you will have to change project settings according to your SDK)
+
+All MediaFoundation Source, sink and transform need to be register with regsvr32 in order to use them. You can use a .bat file
+or configure your compiler to register them (with rights administrator).
+
+
+--------------------------------------------------
+* general purpose
+
+With Visual Studio i use those parameters (Tools->Options->Editor Text->C/C++) :
+
+- Tab size         = 1
+- Withdrawals size = 2
+- All projects are only tested in debug mode. I don't use release mode, because MFNode Project is just experimental.
+
+
+--------------------------------------------------
+
+* Common
+
+It contains some files used by different project, some helpers for debugging, loging, guid, and so on...
+A note on macro like IF_FAILED_RETURN and others : they are usefull for debugging, but suffer from being called
+twice on failure. They should be only use for debugging...
+
+
+--------------------------------------------------
+
+* Docs
+
+- ChangeLog.txt contains a summary about updated files
+- README.txt (the old one)
+
+
+--------------------------------------------------
+
+* Library used by MFNode Project :
+
+
+- LibA52Audio
+
+From http://liba52.sourceforge.net/
+
+A decoder for ac3 audio format. I just rename .c files to .cpp files. Doing this, i can compile it
+and use it without error with Visual Studio. Two projects use this library : MFSrA52Decoder and MFTA52Decoder.
+
+
+
+- LibMpeg2
+
+From http://sourceforge.net/projects/libmpeg2/ (version libmpeg2-0.5.1).
+
+A decoder for mpeg1/mpeg2 video format. It's the original project, no modification have been made.
+One project uses this library : MFTMpeg2Decoder.
+
+
+
+- LibMpegAudio
+
+A decoder for mp1/mp2 audio format. I use two projects :
+
+https://sourceforge.net/projects/libmp2codec/
+http://www.mpg123.de/
+
+I rewrote the source code in a C++ way. I just keep mp1/mp2 decoding code. For mp3 decoding, MediaFoundation
+provides one. Also i made things simple, it doesn't handle free format.
+
+
+--------------------------------------------------
+
+* The player :
+
+
+- MFNodePlayer
+
+You can see how to use some MediaFoundation API inside a WIN32 application.
+
+
+-> Wave Session : uses MFTWaveMixer in a custom MediaSession.
+
+With this session, you can mix two audio wave files (.wav) in real time. Because TopoEdit cannot handle Transform
+with two input type, we need a custom MediaSession. Since Windows 8, it seems that MediaSession can handle two
+input stream from a MFT. If someone can confirm.
+The custom MediaSession is a derivated code from the book :
+"Developing Microsoft Media Foundation Application" (thanks to Anton Polinger). Wave files must be same audio type.
+
+
+-> Screen Capture Session : uses MFSrScreenCapture.
+
+With this session, you can display your desktop.
+
+
+-> Http Streamer Session : uses MFSrScreenCapture/MFTJpegEncoder and MFSkJpegHttpStreamer.
+
+With this session, you can send desktop's frames to http application, like Vlc/Web browser.
+You can use a tool like VLC and open a network stream : http://127.0.0.1:13754.
+
+
+-> Flv Session : expects the flv file contains audio and video.
+
+
+-> Renderer Session : uses MFSkVideoRenderer.
+
+With this session, you can control shader's parameters from the video renderer (constrast, saturation, gray, ...).
+You can use Cuda decoder or not.
+
+
+-> Sequencer Session : use the sequencer source.
+
+This session just do smooth transition between two files (.mp4), not a playlist.
+
+
+-> Audio/Video Capture Session
+
+This session show how to use MFCreateAggregateSource for different capture source.
+
+
+-> Dxva2 Session : uses MFSkDxva2Renderer.
+
+With this session, you can control Dxva2 parameters from the Dxva2 renderer (brightness, hue, contrast, ...).
+
+
+--------------------------------------------------
+
+The current README is not finished, check the old one from the Docs, for more informations.
+I will merge both later.
